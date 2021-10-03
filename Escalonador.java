@@ -7,15 +7,15 @@ import java.util.*;
 public class Escalonador {
 
     private static List<File> arquivos;
+    private static final String diretorio = "C:programas";
     private static int quantum;
     private static List<BCP> tabelaProcessos = new ArrayList<>();    //lista contendo o BCP de todos os programas
     private static Queue<BCP> processosProntos = new LinkedList<>();  //fila de processos prontos
     private static Queue<BCP> processosBloqueados = new LinkedList<>(); //fila de processos bloqueados
 
-
-    /*  Responsavel por pegar os arquivos contidos na Pasta "programas" e inicializar a variavel "quantum"  */
     public static void catch_inputs() throws FileNotFoundException {
-        File dir = new File("programas"); //Pasta contendo os arquivos-programa
+
+        File dir = new File(diretorio); //Pasta contendo os arquivos-programa
         arquivos = new LinkedList<>(List.of(dir.listFiles()));
 
         for (File file : arquivos) {
@@ -31,7 +31,7 @@ public class Escalonador {
     }
 
 
-    /*  Responsavel por pegar cada programa(arquivo.txt) e criar seu BCP  */
+    /*Responsavel por pegar cada programa(arquivo.txt) e criar seu BCP*/
     public static BCP manipulaBCP(File file) {
         String nome = "";
         String [] comandos = new String[21];
@@ -62,7 +62,6 @@ public class Escalonador {
         }
     }
 
-
     public static void main(String[] args) {
 
         try {
@@ -79,6 +78,17 @@ public class Escalonador {
         processosProntos.addAll(tabelaProcessos); //add os processos na fila de Processos Prontos
 
         // 2)
+        while (tabelaProcessos.size() != 0){     // enquanto ainda houver processos para serem executados
+
+            //se a fila Processos Prontos NAO estiver vazia
+                //pega o primeiro da fila ProcessosProntos e executado o numero instrucoes segundo o quantum disponivel
+                    // for(i ate numero de quantum)
+                        //se tiver uma instrucao de SAIDA...
+                        //se tiver uma instrucao de E/S ...
+
+            //se a fila Processos Prontos ESTIVER vazia (só existem processos na fila Processos Bloqueados)
+
+        }
 
 
     }
