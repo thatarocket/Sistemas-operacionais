@@ -3,7 +3,7 @@ public class BCP {
     private String estadoProcesso;  //estado que o programa se encontra (executando, bloqueado ou pronto)
     private String registradorX;    //estado do registrador de uso GERAL X
     private String registradorY;    //estado do registrador de uso GERAL Y
-    private String contadorPrograma;    //contador de programa (registrador de uso ESPECIFICO)
+    private int contadorPrograma;    //contador de programa (registrador de uso ESPECIFICO) - posicao do arranjo segTextProg
     private String [] segTextoProg;    //segmento de texto do programa;
 
     public BCP(String nome, String[]segTextoProg){
@@ -30,7 +30,7 @@ public class BCP {
         return registradorY;
     }
 
-    public String getContadorPrograma() {
+    public int getContadorPrograma() {
         return contadorPrograma;
     }
 
@@ -53,7 +53,7 @@ public class BCP {
         this.registradorY = registradorY;
     }
 
-    public void setContadorPrograma(String contadorPrograma) {
+    public void setContadorPrograma(int contadorPrograma) {
         this.contadorPrograma = contadorPrograma;
     }
 

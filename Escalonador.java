@@ -7,15 +7,15 @@ import java.util.*;
 public class Escalonador {
 
     private static List<File> arquivos;
-    private static final String diretorio = "C:programas";
     private static int quantum;
-    private static List<BCP> listaBCPs = new ArrayList<>();    //lista contendo o BCP de todos os programas
+    private static List<BCP> tabelaProcessos = new ArrayList<>();    //lista contendo o BCP de todos os programas
     private static Queue<BCP> processosProntos = new LinkedList<>();  //fila de processos prontos
     private static Queue<BCP> processosBloqueados = new LinkedList<>(); //fila de processos bloqueados
 
-    public static void catch_inputs() throws FileNotFoundException {
 
-        File dir = new File(diretorio); //Pasta contendo os arquivos-programa
+    /*  Responsavel por pegar os arquivos contidos na Pasta "programas" e inicializar a variavel "quantum"  */
+    public static void catch_inputs() throws FileNotFoundException {
+        File dir = new File("programas"); //Pasta contendo os arquivos-programa
         arquivos = new LinkedList<>(List.of(dir.listFiles()));
 
         for (File file : arquivos) {
@@ -28,18 +28,10 @@ public class Escalonador {
                 arquivos.remove(file);
             }
         }
-
-        /* pega o nome da pasta
-        pega os arquivos que estao na pasta(programas.txt + quantum)
-        guarda o quantum
-        programas.txt: 
-            Guardar a primeira linha - nome programa
-            Linhas posteriores - instruções (ATÉ A PALAVRA SAIDA. MAX 21 COMANDOS = 21 linhas de comando(inclui saida))
-        */
     }
 
 
-    /*Responsavel por pegar cada programa(arquivo.txt) e criar seu BCP*/
+    /*  Responsavel por pegar cada programa(arquivo.txt) e criar seu BCP  */
     public static BCP manipulaBCP(File file) {
         String nome = "";
         String [] comandos = new String[21];
@@ -70,6 +62,7 @@ public class Escalonador {
         }
     }
 
+
     public static void main(String[] args) {
 
         try {
@@ -82,8 +75,8 @@ public class Escalonador {
         /*    ALGORITMO ROUND ROBIN    */
         // 1)
         Collections.sort(arquivos); //ordenanos os processos em ordem alfabetica
-        arquivos.forEach(arq -> listaBCPs.add(manipulaBCP(arq))); //monta uma lista de BCPs dos processos
-        processosProntos.addAll(listaBCPs); //add os processos na fila de Processos Prontos
+        arquivos.forEach(arq -> tabelaProcessos.add(manipulaBCP(arq))); //monta a Tabela de Processos
+        processosProntos.addAll(tabelaProcessos); //add os processos na fila de Processos Prontos
 
         // 2)
 
