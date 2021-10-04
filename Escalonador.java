@@ -2,7 +2,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
-
 import static java.util.Comparator.comparing;
 
 
@@ -33,6 +32,7 @@ public class Escalonador {
         }
     }
 
+
     /*Responsavel por pegar cada programa(arquivo.txt) e criar seu BCP*/
     public static BCP manipulaBCP(File file) {
         String nome = "";
@@ -62,10 +62,12 @@ public class Escalonador {
         }
     }
 
+
     public static boolean instrucaoValida(String instrucao) {
         if (instrucao.equals("COM") || instrucao.equals("E/S") || instrucao.equals("SAIDA")) return true;
         return false;
     }
+
 
     /*  Responsavel por fazer as devidas alteracoes quando houver uma instrucao "SAIDA"  */
     public static void manipulaSAIDA(BCP bcp) {
@@ -83,6 +85,8 @@ public class Escalonador {
         bcp.setTempoEspera(2);
     }
 
+
+
     public static void atualizaProcessosBloqueados() {
         for (BCP bcp : processosBloqueados) {
             if (bcp.getTempoEspera() == 0) {
@@ -92,6 +96,8 @@ public class Escalonador {
             }
         }
     }
+
+
 
     public static void main(String[] args) {
 
