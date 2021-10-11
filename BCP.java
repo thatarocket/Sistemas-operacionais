@@ -6,6 +6,9 @@ public class BCP {
     private int contadorPrograma;    //contador de programa (registrador de uso ESPECIFICO) - posicao do arranjo segTextProg
     private String[] segTextoProg;    //segmento de texto do programa;
     private int tempoEspera;
+    private int trocas;
+    private int instrucoes;
+
 
     public BCP(String nome, String[] segTextoProg) {
         this.nome = nome;
@@ -13,6 +16,9 @@ public class BCP {
         this.tempoEspera = 0;
         this.estadoProcesso = "executando";
         this.contadorPrograma = 0;
+        this.registradorX = 0;
+        this.registradorY = 0;
+        this.trocas = 0;
     }
 
 
@@ -46,6 +52,14 @@ public class BCP {
         return segTextoProg;
     }
 
+    public int getTrocas(){
+        return trocas;
+    }
+
+    public int getInstrucoes(){
+        return instrucoes;
+    }
+
 
     /* METODOS SETTERS*/
 
@@ -68,4 +82,13 @@ public class BCP {
     public void setTempoEspera(int tempoEspera) {
         this.tempoEspera = tempoEspera;
     }
+
+    public void setTrocas(int trocas) {
+        this.trocas = trocas;
+    }
+
+    public void setInstrucoes(int instrucoes) {
+      this.instrucoes = instrucoes;
+    }
+
 }

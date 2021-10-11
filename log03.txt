@@ -1,0 +1,44 @@
+Carregando TESTE-1
+Carregando TESTE-10
+Carregando TESTE-2
+Carregando TESTE-3
+Carregando TESTE-4
+Carregando TESTE-5
+Carregando TESTE-6
+Carregando TESTE-7
+Carregando TESTE-8
+Carregando TESTE-9
+Executando TESTE-1
+Interrompendo TESTE-1 após 4 instruções
+Executando TESTE-10
+Interrompendo TESTE-10 após 4 instruções
+Executando TESTE-2
+Interrompendo TESTE-2 após 4 instruções
+Executando TESTE-3
+Interrompendo TESTE-3 após 4 instruções
+Executando TESTE-4
+Interrompendo TESTE-4 após 4 instruções
+Executando TESTE-5
+Interrompendo TESTE-5 após 4 instruções
+Executando TESTE-6
+Interrompendo TESTE-6 após 4 instruções
+Executando TESTE-7
+Interrompendo TESTE-7 após 4 instruções
+Executando TESTE-8
+Interrompendo TESTE-8 após 4 instruções
+Executando TESTE-9
+Interrompendo TESTE-9 após 4 instruções
+Executando TESTE-1
+Interrompendo TESTE-1 após 4 instruções
+Executando TESTE-10
+Interrompendo TESTE-10 após 4 instruções
+Executando TESTE-2
+Interrompendo TESTE-2 após 4 instruções
+Executando TESTE-3
+Interrompendo TESTE-3 após 4 instruções
+Executando TESTE-4
+E/S iniciada em TESTE-4
+Interrompendo TESTE-4 apos 1 instrucoes
+MEDIA DE TROCAS: 1.5
+MEDIA DE INSTRUCOES: 1.8
+QUANTUM: 3
