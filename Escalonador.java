@@ -7,7 +7,6 @@ import static java.util.Comparator.comparing;
 public class Escalonador {
 
     private static List<File> arquivos;
-    private static final String diretorio = "programas";
     private static int quantum;
     private static List<BCP> tabelaProcessos = new ArrayList<>();    //lista contendo o BCP de todos os programas
     private static Queue<BCP> processosProntos = new LinkedList<>();  //fila de processos prontos
@@ -17,7 +16,7 @@ public class Escalonador {
 
     /*Responsavel por pegar os arquivos da pasta "programas" e armazenar na variavel "arquivos". Ele tb inicializa a variavel "quantum"*/
     public static void catch_inputs() throws FileNotFoundException {
-        File dir = new File(diretorio); //Pasta contendo os arquivos-programa
+        File dir = new File("programas"); //Pasta contendo os arquivos-programa
         arquivos = new LinkedList<>(List.of(dir.listFiles()));
 
         for (File file : arquivos) {
@@ -135,7 +134,7 @@ public class Escalonador {
                             if (instrucaoAtual.equals("E/S")) {
                                 bcp.setTrocas(bcp.getTrocas() + 1);
                                 fileout.write("E/S iniciada em " + bcp.getNome() + "\r\n");
-                                fileout.write("Interrompendo " + bcp.getNome() + " apos " + contQuantum + " instrucoes" + "\r\n");
+                                fileout.write("Interrompendo " + bcp.getNome() + " após " + contQuantum + " instruções" + "\r\n");
                                 manipulaES(bcp);
                                 pare = true;
                             } else if (instrucaoAtual.equals("SAIDA")) {
@@ -212,6 +211,5 @@ public class Escalonador {
         } catch (IOException io) {
             //
         }
-
     }
 }
