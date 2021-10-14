@@ -119,30 +119,32 @@ public class Escalonador {
 
         // 2)
         while (!tabelaProcessos.isEmpty()) {     // enquanto ainda houver processos para serem executados
-            boolean pare = false;
+            boolean pare = false; //saida
+
             //se a fila Processos Prontos NAO estiver vazia
             if (!processosProntos.isEmpty()) {
                 for (BCP bcp : processosProntos) {
                     fileout.write("Executando " + bcp.getNome() + "\r\n");
                     int contQuantum = 1; //para nao alterar no valor atual
-                    String instrucaoAtual = bcp.getSegTextoProg()[bcp.getContadorPrograma()];
-
+                    String instrucaoAtual = "";
                     while (contQuantum <= quantum) { //o quantum esta com o valor inicial e vai diminuindo conforme avanca
+                        instrucaoAtual = bcp.getSegTextoProg()[bcp.getContadorPrograma()];
+                        fileout.write(" ~~~~~ MEU COMANDO EH " + instrucaoAtual + "~~~~~ \r\n");
                         if (instrucaoValida(instrucaoAtual)) {  // caso a instrucao seja valida
                             if (instrucaoAtual.equals("COM")) bcp.setInstrucoes(bcp.getInstrucoes() + 1);
 
                             if (instrucaoAtual.equals("E/S")) {
-                                bcp.setTrocas(bcp.getTrocas() + 1);
                                 fileout.write("E/S iniciada em " + bcp.getNome() + "\r\n");
-                                fileout.write("Interrompendo " + bcp.getNome() + " após " + contQuantum + " instruções" + "\r\n");
                                 manipulaES(bcp);
                                 pare = true;
-                            } else if (instrucaoAtual.equals("SAIDA")) {
+                            }
+                            else if (instrucaoAtual.equals("SAIDA")) {
                                 manipulaSAIDA(bcp);
                                 bcp.setTrocas(bcp.getTrocas() + 1);
                                 fileout.write(bcp.getNome() + " terminado. X=" + bcp.getRegistradorX() + ". " + "Y=" + bcp.getRegistradorY() + "\r\n");
                                 pare = true;
-                            } else if (instrucaoAtual.substring(0, 1).equals("X=") || instrucaoAtual.substring(0, 1).equals("Y=")) {
+                            }
+                            else if (instrucaoAtual.substring(0, 1).equals("X=") || instrucaoAtual.substring(0, 1).equals("Y=")) {
                                 bcp.setInstrucoes(bcp.getInstrucoes() + 1);
                                 if (instrucaoAtual.substring(0).equals("X"))
                                     bcp.setRegistradorX(Integer.parseInt(instrucaoAtual.substring(2, instrucaoAtual.length() - 1)));
@@ -152,19 +154,22 @@ public class Escalonador {
 
                             bcp.setContadorPrograma(bcp.getContadorPrograma() + 1); //atualiza o contador de programa
                             contQuantum++;
-                            if (pare == true) break;
+                            processosBloqueados.forEach(processo -> processo.setTempoEspera(processo.getTempoEspera() - 1));  //decrementa 1 unidade do tempo de espera de todos na fila de bloqueados
+                            atualizaProcessosBloqueados(); //checa se algum processo teve seu tempo de espera zerado
+                            if (pare) break;
                         }
                     }
 
-                    if (contQuantum > quantum) { //Passou do quantum que podia
+                    if (contQuantum >= quantum || (pare != true && instrucaoAtual != "SAIDA")) { //Passou do quantum que podia
+                        contQuantum--;
                         fileout.write("Interrompendo " + bcp.getNome() + " após " + contQuantum + " instruções" + "\r\n");
                         bcp.setTrocas(bcp.getTrocas() + 1);
                     }
-                    processosBloqueados.forEach(processo -> processo.setTempoEspera(processo.getTempoEspera() - 1));  //decrementa 1 unidade do tempo de espera de todos na fila de bloqueados
-                    atualizaProcessosBloqueados(); //checa se algum processo teve seu tempo de espera zerado
-                    if (pare == true) break;
+
+                    if (pare) continue;
                 }
-                if (pare == true) break;
+                if (pare) break;
+
             }
 
             //se a fila Processos Prontos ESTIVER vazia (existem somente processos na fila Processos Bloqueados)
