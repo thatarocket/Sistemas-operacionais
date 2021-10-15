@@ -138,7 +138,8 @@ public class Escalonador {
                     String instrucao = bcp.getSegTextoProg()[bcp.getContadorPrograma()];
                     if (instrucao.equals("E/S")) {
                         fileout.write("E/S iniciada em " + bcp.getNome() + "\r\n");
-                        fileout.write("Interrompendo " + bcp.getNome() + " após " + i + " instruções" + "\r\n");
+                        if(i > 1) fileout.write("Interrompendo " + bcp.getNome() + " após " + i + " instruções" + "\r\n");
+                        else fileout.write("Interrompendo " + bcp.getNome() + " após " + i + " instrução" + "\r\n");
                         manipulaES(bcp);
                         bcp.setTrocas(bcp.getTrocas() + 1);
                         entradaSaida = true;
@@ -181,9 +182,10 @@ public class Escalonador {
                   }
                 }
             }
-            if (!entradaSaida) //nao houve E/S
-                fileout.write("Interrompendo " + bcp.getNome() + " após " + quantum + " instruções" + "\r\n");
-
+            if (!entradaSaida) {//nao houve E/S
+                if(i > 1) fileout.write("Interrompendo " + bcp.getNome() + " após " + quantum + " instruções" + "\r\n");
+                else fileout.write("Interrompendo " + bcp.getNome() + " após " + quantum + " instrução" + "\r\n");
+            }
             processosProntos.add(bcp);
 
             processosBloqueados.forEach(processo -> processo.setTempoEspera(processo.getTempoEspera() - 1));  //decrementa 1 unidade do tempo de espera de todos na fila de bloqueados
