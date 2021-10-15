@@ -9,8 +9,8 @@ public class Escalonador {
     private static List<File> arquivos;
     private static int quantum;
     private static List<BCP> tabelaProcessos = new ArrayList<>();    //lista contendo o BCP de todos os programas
-    private static Queue<BCP> processosProntos = new LinkedList<>();  //fila de processos prontos
-    private static Queue<BCP> processosBloqueados = new LinkedList<>(); //fila de processos bloqueados
+    private static Queue<BCP> processosProntos = new ArrayDeque<>();  //fila de processos prontos
+    private static Queue<BCP> processosBloqueados = new ArrayDeque<>(); //fila de processos bloqueados
     private static FileWriter fileout;
     private static List<BCP> listaProcessos;
 
@@ -82,6 +82,11 @@ public class Escalonador {
 
     /*  Responsavel por fazer as devidas alteracoes quando houver uma instrucao "SAIDA"  */
     public static void manipulaSAIDA(BCP bcp) {
+
+        System.out.println(bcp.getNome() + " terminado. X=" + bcp.getRegistradorX() + ". " + "Y=" + bcp.getRegistradorY() + "\r\n");
+
+        bcp.setInstrucoes(bcp.getInstrucoes() + 1);
+        bcp.setTrocas(bcp.getTrocas() + 1);
         bcp.setEstadoProcesso("pronto");
         processosProntos.remove(bcp);
         processosBloqueados.remove(bcp);
@@ -90,20 +95,63 @@ public class Escalonador {
 
 
     /*  Responsavel por fazer as devidas alteracoes quando houver uma instrucao "E/S"  */
-    public static void manipulaES(BCP bcp) {
+    public static void manipulaES(BCP bcp, int quantum) {
+
+        System.out.println("E/S iniciada em " + bcp.getNome() + "\r\n");
+        System.out.println("Interrompendo " + bcp.getNome() + " após " + quantum + " instruções" + "\r\n");
+
+        bcp.setTrocas(bcp.getTrocas() + 1);
         bcp.setEstadoProcesso("bloqueado");
+        bcp.setInstrucoes(bcp.getInstrucoes() + 1);
+        bcp.setContadorPrograma(bcp.getContadorPrograma() + 1);
         processosBloqueados.add(bcp);
         processosProntos.remove(bcp);
         bcp.setTempoEspera(2);
     }
 
 
-    public static void atualizaProcessosBloqueados() {
-        for (BCP bcp : processosBloqueados) {
-            if (bcp.getTempoEspera() == 0) {
-                bcp.setEstadoProcesso("pronto");
-                processosProntos.add(bcp);
-                processosBloqueados.remove(bcp);
+    public static boolean atualizaProcessosBloqueados() {
+        List<BCP> adicionar = new ArrayList<>();
+        List<BCP> retirar = new ArrayList<>();
+        boolean atualizou = false;
+        if (!processosBloqueados.isEmpty()) {
+            for (BCP bcp : processosBloqueados) {
+                if (bcp.getTempoEspera() == 0) {
+                    bcp.setEstadoProcesso("pronto");
+                    adicionar.add(bcp);
+                    retirar.add(bcp);
+                    atualizou = true;
+                }
+            }
+            adicionar.forEach(bcp -> processosProntos.add(bcp));
+            retirar.forEach(bcp -> processosBloqueados.remove(bcp));
+        }
+        return atualizou;
+    }
+
+    public static void decrementaTempo() {
+        if (processosBloqueados.size() == tabelaProcessos.size()) {
+            boolean stop = false;
+            List<BCP> adicionar = new ArrayList<>();
+            List<BCP> retirar = new ArrayList<>();
+            for (BCP bcp_ : processosBloqueados) {
+                if (bcp_.getTempoEspera() == 0) {
+                    bcp_.setEstadoProcesso("pronto");
+                    adicionar.add(bcp_);
+                    retirar.add(bcp_);
+                    stop = true;
+                }
+            }
+            if (stop) {
+                adicionar.forEach(b -> processosProntos.add(b));
+                retirar.forEach(b -> processosBloqueados.remove(b));
+                adicionar.clear();
+                retirar.clear();
+            } else {
+                while (!stop) { //espera ate que algum processa tenha seu tempo de espera igual a ZERO
+                    processosBloqueados.forEach(processo -> processo.setTempoEspera(processo.getTempoEspera() - 1));
+                    stop = atualizaProcessosBloqueados();
+                }
             }
         }
     }
@@ -121,70 +169,61 @@ public class Escalonador {
 
         // 2)
         while (!tabelaProcessos.isEmpty()) {     // enquanto ainda houver processos para serem executados
-            BCP bcp = processosProntos.poll();
-            boolean entradaSaida = false;
-            fileout.write("Executando " + bcp.getNome() + "\r\n");
+            atualizaProcessosBloqueados();
+            if (processosProntos.isEmpty()) decrementaTempo();
 
-            for (int i = 1; i <= quantum; i++) {
-                if (bcp.getSegTextoProg()[bcp.getContadorPrograma()] != null) {
+            else {
+                BCP bcp = processosProntos.poll();
+                boolean entradaSaida = false;
+                System.out.println("Executando " + bcp.getNome() + "\r\n");
+
+                for (int i = 1; i <= quantum; i++) {
                     String instrucao = bcp.getSegTextoProg()[bcp.getContadorPrograma()];
+
                     if (instrucao.equals("E/S")) {
-                        fileout.write("E/S iniciada em " + bcp.getNome() + "\r\n");
-                        fileout.write("Interrompendo " + bcp.getNome() + " após " + i + " instruções" + "\r\n");
-                        manipulaES(bcp);
-                        bcp.setTrocas(bcp.getTrocas() + 1);
+                        manipulaES(bcp, i);
                         entradaSaida = true;
+                        break;
                     } else if (instrucao.equals("SAIDA")) {
-                        fileout.write(bcp.getNome() + " terminado. X=" + bcp.getRegistradorX() + ". " + "Y=" + bcp.getRegistradorY() + "\r\n");
                         manipulaSAIDA(bcp);
-                        bcp.setTrocas(bcp.getTrocas() + 1);
-                        i = quantum + 1;
+                        entradaSaida = true;
+                        break;
                     } else if (instrucao.equals("COM")) {
                         bcp.setInstrucoes(bcp.getInstrucoes() + 1);
-                    } else if (instrucao.contains("X=") || instrucao.contains("Y=")) {
+                        bcp.setContadorPrograma(bcp.getContadorPrograma() + 1);
+                    } else if (instrucao.contains("X=")) {
                         bcp.setInstrucoes(bcp.getInstrucoes() + 1);
-                        if (instrucao.substring(1).equals("X"))
-                            bcp.setRegistradorX(Integer.parseInt(instrucao.substring(2, instrucao.length() - 1)));
-                        else if (instrucao.substring(1).equals("Y"))
-                            bcp.setRegistradorY(Integer.parseInt(instrucao.substring(2, instrucao.length() - 1)));
-                    }
-                    bcp.setContadorPrograma(bcp.getContadorPrograma() + 1);
-                } else if (processosProntos.isEmpty() && !processosProntos.isEmpty()) {
-                    boolean stop = false;
-                    while (stop == false) {
-                        for (BCP bcp_ : processosBloqueados) {
-                            if (bcp_.getTempoEspera() == 0) {
-                                stop = true;
-                                bcp_.setEstadoProcesso("pronto");
-                                processosProntos.add(bcp_);
-                                processosBloqueados.remove(bcp_);
-                            }
-                        }
-                        if (stop == false)
-                            processosBloqueados.forEach(processo -> processo.setTempoEspera(processo.getTempoEspera() - 1));
+                        bcp.setContadorPrograma(bcp.getContadorPrograma() + 1);
+                        //bcp.setRegistradorX(Integer.parseInt(instrucao.substring(2, instrucao.length() - 1)));
+                    } else if (instrucao.contains("Y=")) {
+                        bcp.setInstrucoes(bcp.getInstrucoes() + 1);
+                        bcp.setContadorPrograma(bcp.getContadorPrograma() + 1);
+                        //bcp.setRegistradorY(Integer.parseInt(instrucao.substring(2, instrucao.length() - 1)));
                     }
                 }
+                if (!entradaSaida) {
+                    System.out.println("Interrompendo " + bcp.getNome() + " após " + quantum + " instruções" + "\r\n");
+                    processosProntos.add(bcp);
+                }
+
+                if (!processosBloqueados.isEmpty()) {
+                    processosBloqueados.forEach(processo -> processo.setTempoEspera(processo.getTempoEspera() - 1));  //decrementa 1 unidade do tempo de espera de todos na fila de bloqueados
+                    atualizaProcessosBloqueados(); //checa se algum processo teve seu tempo de espera zerado
+                }
             }
-            if (!entradaSaida)
-                fileout.write("Interrompendo " + bcp.getNome() + " após " + quantum + " instruções" + "\r\n");
-
-            processosProntos.add(bcp);
-
-            processosBloqueados.forEach(processo -> processo.setTempoEspera(processo.getTempoEspera() - 1));  //decrementa 1 unidade do tempo de espera de todos na fila de bloqueados
-            atualizaProcessosBloqueados(); //checa se algum processo teve seu tempo de espera zerado
         }
 
         double somaTrocas = 0;
         for (BCP bcp : listaProcessos) somaTrocas += bcp.getTrocas();
         double mediaTrocas = somaTrocas / arquivos.size();
-        fileout.write("MEDIA DE TROCAS: " + mediaTrocas + "\r\n");
+        System.out.println("MEDIA DE TROCAS: " + mediaTrocas + "\r\n");
 
         double somaInstrucoes = 0;
         for (BCP bcp : listaProcessos) somaInstrucoes += bcp.getInstrucoes();
         double mediaInstrucoes = somaInstrucoes / arquivos.size();
-        fileout.write("MEDIA DE INSTRUCOES: " + mediaInstrucoes + "\r\n");
+        System.out.println("MEDIA DE INSTRUCOES: " + mediaInstrucoes + "\r\n");
 
-        fileout.write("QUANTUM: " + quantum + "\r\n");
+        System.out.println("QUANTUM: " + quantum + "\r\n");
 
         fileout.close();
     }
