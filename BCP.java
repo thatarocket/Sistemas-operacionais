@@ -52,11 +52,11 @@ public class BCP {
         return segTextoProg;
     }
 
-    public int getTrocas(){
+    public int getTrocas() {
         return trocas;
     }
 
-    public int getInstrucoes(){
+    public int getInstrucoes() {
         return instrucoes;
     }
 
@@ -88,7 +88,7 @@ public class BCP {
     }
 
     public void setInstrucoes(int instrucoes) {
-      this.instrucoes = instrucoes;
+        this.instrucoes = instrucoes;
     }
 
 }
