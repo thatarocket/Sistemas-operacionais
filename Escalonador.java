@@ -9,8 +9,8 @@ public class Escalonador {
     private static List<File> arquivos;
     private static int quantum;
     private static List<BCP> tabelaProcessos = new ArrayList<>();    //lista contendo o BCP de todos os programas
-    private static Queue<BCP> processosProntos = new LinkedList<>();  //fila de processos prontos
-    private static Queue<BCP> processosBloqueados = new LinkedList<>(); //fila de processos bloqueados
+    private static Queue<BCP> processosProntos = new ArrayDeque<>();  //fila de processos prontos
+    private static Queue<BCP> processosBloqueados = new ArrayDeque<>(); //fila de processos bloqueados
     private static FileWriter fileout;
     private static List<BCP> listaProcessos;
 
@@ -69,7 +69,7 @@ public class Escalonador {
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("OPS! ERRO no metodo <manipulaBCP>\"");
+            System.out.println("OPS! ERRO no metodo <manipulaBCP>");
             return null;
         }
     }
@@ -81,28 +81,96 @@ public class Escalonador {
 
 
     /*  Responsavel por fazer as devidas alteracoes quando houver uma instrucao "SAIDA"  */
-    public static void manipulaSAIDA(BCP bcp) {
+    public static void manipulaSAIDA(BCP bcp) throws IOException {
+
+        fileout.write(bcp.getNome() + " terminado. X=" + bcp.getRegistradorX() + ". " + "Y=" + bcp.getRegistradorY() + "\r\n");
+
+        bcp.setInstrucoes(bcp.getInstrucoes() + 1);
+        bcp.setTrocas(bcp.getTrocas() + 1);
         bcp.setEstadoProcesso("pronto");
         processosProntos.remove(bcp);
         tabelaProcessos.remove(bcp);
     }
 
 
-    /*  Responsavel por fazer as devidas alteracoes quando houver uma instrucao "E/S"  */
-    public static void manipulaES(BCP bcp) {
+    /*********************************************************************************
+    * Responsavel por fazer as devidas alteracoes quando houver uma instrucao "E/S"  *
+    **********************************************************************************/
+    public static void manipulaES(BCP bcp, int quantum) throws IOException {
+
+        fileout.write("E/S iniciada em " + bcp.getNome() + "\r\n");
+        if(quantum > 1 ) fileout.write("Interrompendo " + bcp.getNome() + " após " + quantum + " instruções" + "\r\n");
+        else fileout.write("Interrompendo " + bcp.getNome() + " após " + quantum + " instrução" + "\r\n");
+
+        bcp.setTrocas(bcp.getTrocas() + 1);
         bcp.setEstadoProcesso("bloqueado");
+        bcp.setInstrucoes(bcp.getInstrucoes() + 1);
+        bcp.setContadorPrograma(bcp.getContadorPrograma() + 1);
         processosBloqueados.add(bcp);
         processosProntos.remove(bcp);
         bcp.setTempoEspera(2);
     }
 
 
+<<<<<<< Updated upstream
     public static void atualizaProcessosBloqueados() {
         for (BCP bcp : processosBloqueados) {
             if (bcp.getTempoEspera() == 0) {
                 bcp.setEstadoProcesso("pronto");
                 processosProntos.add(bcp);
                 processosBloqueados.remove(bcp);
+=======
+    /**************************************************************************************************
+    *  Verifica se existe algum processo na fila de Processos Bloqueados que tem seu tempo ZERADO e   *
+    *  portantanto precisa voltar para a fila de Processos Prontos                                    *
+    ***************************************************************************************************/
+    public static boolean atualizaProcessosBloqueados() {
+        List<BCP> adicionar = new ArrayList<>();
+        List<BCP> retirar = new ArrayList<>();
+        boolean atualizou = false;
+        if (!processosBloqueados.isEmpty()) {
+            for (BCP bcp : processosBloqueados) {
+                if (bcp.getTempoEspera() == 0) {
+                    bcp.setEstadoProcesso("pronto");
+                    adicionar.add(bcp);
+                    retirar.add(bcp);
+                    atualizou = true;
+                }
+            }
+            adicionar.forEach(bcp -> processosProntos.add(bcp));
+            retirar.forEach(bcp -> processosBloqueados.remove(bcp));
+        }
+        return atualizou;
+    }
+
+
+    /**************************************************************************************
+     * Decrementa o tempo de todos os processos que estao na fila de Processos Bloqueados *
+    ***************************************************************************************/
+    public static void decrementaTempo() {
+        if (processosBloqueados.size() == tabelaProcessos.size()) {
+            boolean stop = false;
+            List<BCP> adicionar = new ArrayList<>();
+            List<BCP> retirar = new ArrayList<>();
+            for (BCP bcp_ : processosBloqueados) {
+                if (bcp_.getTempoEspera() == 0) {
+                    bcp_.setEstadoProcesso("pronto");
+                    adicionar.add(bcp_);
+                    retirar.add(bcp_);
+                    stop = true;
+                }
+            }
+            if (stop) {
+                adicionar.forEach(b -> processosProntos.add(b));
+                retirar.forEach(b -> processosBloqueados.remove(b));
+                adicionar.clear();
+                retirar.clear();
+            } else {
+                while (!stop) { //espera ate que algum processa tenha seu tempo de espera igual a ZERO
+                    processosBloqueados.forEach(processo -> processo.setTempoEspera(processo.getTempoEspera() - 1));
+                    stop = atualizaProcessosBloqueados();
+                }
+>>>>>>> Stashed changes
             }
         }
     }
@@ -119,6 +187,7 @@ public class Escalonador {
 
         // 2)
         while (!tabelaProcessos.isEmpty()) {     // enquanto ainda houver processos para serem executados
+<<<<<<< Updated upstream
             boolean pare = false;
             //se a fila Processos Prontos NAO estiver vazia
             if (!processosProntos.isEmpty()) {
@@ -182,6 +251,51 @@ public class Escalonador {
                     if (!stop)
                         processosBloqueados.forEach(processo -> processo.setTempoEspera(processo.getTempoEspera() - 1));
                 }
+=======
+            atualizaProcessosBloqueados();
+            if (processosProntos.isEmpty()) decrementaTempo();
+
+            else {
+                BCP bcp = processosProntos.poll();
+                boolean entradaSaida = false;
+                fileout.write("Executando " + bcp.getNome() + "\r\n");
+
+                for (int i = 1; i <= quantum; i++) {
+                    String instrucao = bcp.getSegTextoProg()[bcp.getContadorPrograma()];
+
+                    if (instrucao.equals("E/S")) {
+                        manipulaES(bcp, i);
+                        entradaSaida = true;
+                        break;
+                    } else if (instrucao.equals("SAIDA")) {
+                        manipulaSAIDA(bcp);
+                        entradaSaida = true;
+                        break;
+                    } else if (instrucao.equals("COM")) {
+                        bcp.setInstrucoes(bcp.getInstrucoes() + 1);
+                        bcp.setContadorPrograma(bcp.getContadorPrograma() + 1);
+                    } else if (instrucao.contains("X=")) {
+                        bcp.setInstrucoes(bcp.getInstrucoes() + 1);
+                        bcp.setContadorPrograma(bcp.getContadorPrograma() + 1);
+                        bcp.setRegistradorX(Integer.parseInt(instrucao.substring(2, instrucao.length())));
+                    } else if (instrucao.contains("Y=")) {
+                        bcp.setInstrucoes(bcp.getInstrucoes() + 1);
+                        bcp.setContadorPrograma(bcp.getContadorPrograma() + 1);
+                        bcp.setRegistradorY(Integer.parseInt(instrucao.substring(2, instrucao.length())));
+                    }
+                }
+                if (!entradaSaida) {
+                    if(quantum > 1 ) fileout.write("Interrompendo " + bcp.getNome() + " após " + quantum + " instruções" + "\r\n");
+                    else fileout.write("Interrompendo " + bcp.getNome() + " após " + quantum + " instrução" + "\r\n");
+                }
+
+                if (!processosBloqueados.isEmpty()) {
+                    processosBloqueados.forEach(processo -> processo.setTempoEspera(processo.getTempoEspera() - 1));  //decrementa 1 unidade do tempo de espera de todos na fila de bloqueados
+                    atualizaProcessosBloqueados(); //checa se algum processo teve seu tempo de espera zerado
+                }
+
+                if(!entradaSaida) processosProntos.add(bcp);
+>>>>>>> Stashed changes
             }
         }
         double somaTrocas = 0;
