@@ -1,8 +1,6 @@
 import java.io.*;
 import java.util.*;
 
-import static java.util.Comparator.comparing;
-
 
 public class Escalonador {
 
@@ -174,8 +172,34 @@ public class Escalonador {
         /*    ALGORITMO ROUND ROBIN    */
         // 1)
         arquivos.forEach(arq -> tabelaProcessos.add(manipulaBCP(arq))); //monta a Tabela de processos
-        Collections.sort(tabelaProcessos, comparing(BCP::getNome));  //ordenanos os processos em ordem alfabetica
-        processosProntos.addAll(tabelaProcessos); //add os processos na fila de Processos Prontos
+        List<String> nomesProcessos = new ArrayList<>();
+        tabelaProcessos.forEach(bcp -> nomesProcessos.add(bcp.getNome()));
+
+        //ordena o nome dos processos em ordem alfabetica
+        Collections.sort(nomesProcessos, new Comparator<String>() {
+            public int compare(String o1, String o2) {
+                return extractInt(o1) - extractInt(o2);
+            }
+
+            int extractInt(String s) {
+                String num = s.replaceAll("\\D", "");
+                // retorna 0 se nao ha digitos no nome
+                return num.isEmpty() ? 0 : Integer.parseInt(num);
+            }
+        });
+
+        //add os processos na fila de Processos Prontos
+        for (String nome : nomesProcessos) {
+            for (BCP bcp : tabelaProcessos) {
+                boolean found = false;
+                if (bcp.getNome().equals(nome)) {
+                    processosProntos.add(bcp);
+                    found = true;
+                }
+                if (found) break;
+            }
+        }
+
         listaProcessos = new ArrayList<>(tabelaProcessos);
 
         for (BCP bcp : processosProntos) fileout.write("Carregando " + bcp.getNome() + "\r\n");
