@@ -3,5 +3,5 @@ EPS entregues na matéria de sistemas operacionais no ano de 2021, 4ºsemestre d
 
 **Exercício Programa 1 (EP1):**</p>
 
-**Autores: [Thais de Souza Rodrigues](https://github.com/thatarocket) e [Melissa Akie Inui](https://github.com/mee-akie)** e [Gabriel de Oliveira Theo](https://github.com/Gab-Theo)** </p>
+**Autores: [Thais de Souza Rodrigues](https://github.com/thatarocket) e [Melissa Akie Inui](https://github.com/mee-akie)** e [Gabriel de Oliveira Theo](https://github.com/Gab-Theo) ** </p>
 **[EM BREVE]**
