@@ -11,6 +11,7 @@ public class Escalonador {
     private static Queue<BCP> processosBloqueados = new ArrayDeque<>(); //fila de processos bloqueados
     private static FileWriter fileout;
     private static List<BCP> listaProcessos;
+    private static int qtdQuantum = 0;
 
     /*Responsavel por pegar os arquivos da pasta "programas" e armazenar na variavel "arquivos". Ele tb inicializa a variavel "quantum"*/
     public static void catch_inputs() throws FileNotFoundException, EscalonadorException {
@@ -102,7 +103,7 @@ public class Escalonador {
 
         fileout.write(bcp.getNome() + " terminado. X=" + bcp.getRegistradorX() + ". " + "Y=" + bcp.getRegistradorY() + "\r\n");
 
-        bcp.setInstrucoes(bcp.getInstrucoes() + quantum);
+        bcp.setInstrucoes(bcp.getInstrucoes() + 1);
         bcp.setTrocas(bcp.getTrocas() + 1);
         bcp.setEstadoProcesso("pronto");
         processosProntos.remove(bcp);
@@ -277,6 +278,8 @@ public class Escalonador {
                 if (!entradaSaida) {
                     processosProntos.add(bcp);
                 }
+
+                qtdQuantum++;
             }
         }
 
@@ -288,7 +291,7 @@ public class Escalonador {
 
         double somaInstrucoes = 0;
         for (BCP bcp : listaProcessos) somaInstrucoes += bcp.getInstrucoes();
-        double mediaInstrucoes = somaInstrucoes / arquivos.size();
+        double mediaInstrucoes = somaInstrucoes / qtdQuantum;
         String mi = String.format("%.2f", mediaInstrucoes).replace(",", ".");
         fileout.write("MEDIA DE INSTRUCOES: " + mi + "\r\n");
         fileout.write("QUANTUM: " + quantum);
