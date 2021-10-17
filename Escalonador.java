@@ -32,8 +32,8 @@ public class Escalonador {
     }
 
     /****************************************
-    *  Responsavel por criar o arquivo log  *
-    *****************************************/
+     *  Responsavel por criar o arquivo log  *
+     *****************************************/
     public static void create_files() throws IOException {
         String filename = "";
         if (String.valueOf(quantum).length() > 1) {
