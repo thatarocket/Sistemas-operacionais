@@ -82,10 +82,11 @@ public class Escalonador {
 
 
     /*  Responsavel por fazer as devidas alteracoes quando houver uma instrucao "SAIDA"  */
-    public static void manipulaSAIDA(BCP bcp) throws IOException {
+    public static void manipulaSAIDA(BCP bcp, int quantum) throws IOException {
 
         fileout.write(bcp.getNome() + " terminado. X=" + bcp.getRegistradorX() + ". " + "Y=" + bcp.getRegistradorY() + "\r\n");
 
+        bcp.setInstrucoes(bcp.getInstrucoes() + quantum);
         bcp.setTrocas(bcp.getTrocas() + 1);
         bcp.setEstadoProcesso("pronto");
         processosProntos.remove(bcp);
@@ -222,7 +223,7 @@ public class Escalonador {
                         entradaSaida = true;
                         break;
                     } else if (instrucao.equals("SAIDA")) {
-                        manipulaSAIDA(bcp);
+                        manipulaSAIDA(bcp, i);
                         entradaSaida = true;
                         break;
                     } else if (instrucao.equals("COM")) {
