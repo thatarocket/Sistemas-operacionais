@@ -6,14 +6,18 @@ public class Escalonador {
 
     private static List<File> arquivos;
     private static int quantum;
-    private static List<BCP> tabelaProcessos = new ArrayList<>();    //lista contendo o BCP de todos os programas
-    private static Queue<BCP> processosProntos = new ArrayDeque<>();  //fila de processos prontos
-    private static Queue<BCP> processosBloqueados = new ArrayDeque<>(); //fila de processos bloqueados
+    private static List<BCP> tabelaProcessos = new ArrayList<>();    //TABELA DE PROCESSOS
+    private static Queue<BCP> processosProntos = new ArrayDeque<>();  //FILA DE PROCESSOS PRONTOS
+    private static Queue<BCP> processosBloqueados = new ArrayDeque<>(); //FILA DE PROCESSOS BLOQUEADOS
     private static FileWriter fileout;
     private static List<BCP> listaProcessos;
     private static int qtdQuantum = 0;
 
-    /*Responsavel por pegar os arquivos da pasta "programas" e armazenar na variavel "arquivos". Ele tb inicializa a variavel "quantum"*/
+    
+    /***********************************************************************************************
+     *  Responsavel por pegar os arquivos da pasta "programas" e armazenar na variavel "arquivos". *
+     *  Ele tb inicializa a variavel "quantum".                                                    *
+     ***********************************************************************************************/
     public static void catch_inputs() throws FileNotFoundException, EscalonadorException {
         File dir = new File("programas"); //Pasta contendo os arquivos-programa
         arquivos = new LinkedList<>(List.of(dir.listFiles()));
