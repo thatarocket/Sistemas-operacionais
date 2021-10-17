@@ -120,8 +120,8 @@ public class Escalonador {
         if (quantum > 1) fileout.write("Interrompendo " + bcp.getNome() + " após " + quantum + " instruções" + "\r\n");
         else fileout.write("Interrompendo " + bcp.getNome() + " após " + quantum + " instrução" + "\r\n");
 
-        bcp.setInstrucoes(bcp.getInstrucoes() + quantum);
         bcp.setTrocas(bcp.getTrocas() + 1);
+        bcp.setInstrucoes(bcp.getInstrucoes() + quantum);
         bcp.setEstadoProcesso("bloqueado");
         bcp.setContadorPrograma(bcp.getContadorPrograma() + 1);
         processosBloqueados.add(bcp);
@@ -266,6 +266,7 @@ public class Escalonador {
                 if (!entradaSaida) {
                     fileout.write("Interrompendo " + bcp.getNome() + " após " + quantum + " instruções" + "\r\n");
                     bcp.setInstrucoes(bcp.getInstrucoes() + quantum);
+                    bcp.setTrocas(bcp.getTrocas() + 1);
                 }
 
                 if (!processosBloqueados.isEmpty()) {
