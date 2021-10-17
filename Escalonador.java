@@ -60,7 +60,7 @@ public class Escalonador {
                 String linha = sc.nextLine();
 
                 if (i == 20 && !linha.equals("SAIDA"))
-                    throw new EscalonadorException("ERRO: A 21a instrucao do programa " + nome + " nao eh uma isntrucao de SAIDA");
+                    throw new EscalonadorException("ERRO: A 21a instrucao do programa " + nome + " nao eh uma instrucao de SAIDA");
 
                 if (linha.equals("SAIDA")) {  //ultima linha do arquivo
                     comandos[i] = linha;
