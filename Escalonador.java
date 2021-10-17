@@ -290,7 +290,7 @@ public class Escalonador {
         double mediaInstrucoes = somaInstrucoes / arquivos.size();
         String mi = String.format("%.2f", mediaInstrucoes).replace(",", ".");
         fileout.write("MEDIA DE INSTRUCOES: " + mi + "\r\n");
-        fileout.write("QUANTUM: " + quantum + "\r\n");
+        fileout.write("QUANTUM: " + quantum);
 
         fileout.close();
     }
