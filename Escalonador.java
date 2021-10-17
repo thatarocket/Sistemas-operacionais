@@ -13,7 +13,7 @@ public class Escalonador {
     private static List<BCP> listaProcessos;
 
     /*Responsavel por pegar os arquivos da pasta "programas" e armazenar na variavel "arquivos". Ele tb inicializa a variavel "quantum"*/
-    public static void catch_inputs() throws FileNotFoundException {
+    public static void catch_inputs() throws FileNotFoundException, EscalonadorException {
         File dir = new File("programas"); //Pasta contendo os arquivos-programa
         arquivos = new LinkedList<>(List.of(dir.listFiles()));
 
@@ -23,6 +23,7 @@ public class Escalonador {
                 while (scanner.hasNext()) {
                     String input = scanner.next();
                     quantum = Integer.parseInt(input);
+                    if (quantum <= 0) throw new EscalonadorException("ERRO: Quantum com valor menor ou igual a ZERO");
                 }
                 arquivos.remove(file);
                 return;
@@ -30,7 +31,9 @@ public class Escalonador {
         }
     }
 
-    // Cria o arquivo de saida
+    /****************************************
+     *  Responsavel por criar o arquivo log  *
+     *****************************************/
     public static void create_files() throws IOException {
         String filename = "";
         if (String.valueOf(quantum).length() > 1) {
@@ -46,18 +49,22 @@ public class Escalonador {
     /***********************************************************************
      * Responsavel por pegar cada programa(arquivo.txt) e criar seu BCP    *
      * *********************************************************************/
-    public static BCP manipulaBCP(File file) {
+    public static BCP manipulaBCP(File file) throws EscalonadorException {
         String nome = "";
         String[] comandos = new String[21];
 
         try {
             Scanner sc = new Scanner(new FileReader("programas/" + file.getName()));
             int i = 0;
-
             while (true) {  //le as linhas do arquivo
                 String linha = sc.nextLine();
 
-                if (linha.equals("SAIDA") || i == 20) {  //ultima linha do arquivo
+                if (i == 20 && !linha.equals("SAIDA"))
+                    throw new EscalonadorException("ERRO: O programa " + nome + " nao possui a instrucao SAIDA");
+                if (i == 21)
+                    throw new EscalonadorException("ERRO: O programa " + nome + " possui mais que 21 instrucoes");
+
+                if (linha.equals("SAIDA")) {  //ultima linha do arquivo
                     comandos[i] = linha;
                     sc.close();
                     return new BCP(nome, comandos);
@@ -65,6 +72,8 @@ public class Escalonador {
                 if (nome.equals("")) { //pega o nome do arquivo (primeira linha do arquivo)
                     nome = linha;
                 } else {
+                    if (!instrucaoValida(linha))
+                        throw new EscalonadorException("ERRO: o programa " + nome + " possui uma instrucao INVALIDA");
                     comandos[i] = linha;
                     i++;
                 }
@@ -77,7 +86,16 @@ public class Escalonador {
 
 
     public static boolean instrucaoValida(String instrucao) {
-        return instrucao.equals("COM") || instrucao.equals("E/S") || instrucao.equals("SAIDA") || instrucao.contains("X=") || instrucao.contains("Y=");
+        if (instrucao.equals("COM") || instrucao.equals("E/S") || instrucao.equals("SAIDA")) return true;
+        if (instrucao.contains("X=") || instrucao.contains("Y=")) {
+            try {
+                Double.parseDouble(instrucao.substring(2, instrucao.length()));
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
 
@@ -169,10 +187,22 @@ public class Escalonador {
     }
 
 
+    /***************************
+     *  ALGORITMO ROUND ROBIN  *
+     ***************************/
     public static void roundRobin() throws IOException {
-        /*    ALGORITMO ROUND ROBIN    */
-        // 1)
-        arquivos.forEach(arq -> tabelaProcessos.add(manipulaBCP(arq))); //monta a Tabela de processos
+
+        //monta a Tabela de processos
+        arquivos.forEach(arq -> {
+            try {
+                tabelaProcessos.add(manipulaBCP(arq));
+            } catch (EscalonadorException ee) {
+                System.out.println(ee.getMessage());
+            } catch (NoSuchElementException e) {
+                System.out.println("ERRO: o arquivo " + arq.getName() + " nao possui a instrucao SAIDA");
+            }
+        });
+
         List<String> nomesProcessos = new ArrayList<>();
         tabelaProcessos.forEach(bcp -> nomesProcessos.add(bcp.getNome()));
 
@@ -217,7 +247,6 @@ public class Escalonador {
 
                 for (int i = 1; i <= quantum; i++) {
                     String instrucao = bcp.getSegTextoProg()[bcp.getContadorPrograma()];
-
                     if (instrucao.equals("E/S")) {
                         manipulaES(bcp, i);
                         entradaSaida = true;
@@ -277,6 +306,8 @@ public class Escalonador {
             roundRobin();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (EscalonadorException ee) {
+            System.out.println(ee.getMessage());
         }
     }
 }
