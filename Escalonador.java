@@ -87,7 +87,9 @@ public class Escalonador {
         }
     }
 
-
+    /*****************************************************************************************************
+     *  Responsavel por fazer a verificacao se a instrucao passada por parametro eh uma instrucao valida *
+     *****************************************************************************************************/
     public static boolean instrucaoValida(String instrucao) {
         if (instrucao.equals("COM") || instrucao.equals("E/S") || instrucao.equals("SAIDA")) return true;
         if (instrucao.contains("X=") || instrucao.contains("Y=")) {
@@ -102,7 +104,9 @@ public class Escalonador {
     }
 
 
-    /*  Responsavel por fazer as devidas alteracoes quando houver uma instrucao "SAIDA"  */
+    /************************************************************************************ 
+    *  Responsavel por fazer as devidas alteracoes quando houver uma instrucao "SAIDA"  *
+    * ***********************************************************************************/
     public static void manipulaSAIDA(BCP bcp, int quantum) throws IOException {
 
         fileout.write(bcp.getNome() + " terminado. X=" + bcp.getRegistradorX() + ". " + "Y=" + bcp.getRegistradorY() + "\r\n");
