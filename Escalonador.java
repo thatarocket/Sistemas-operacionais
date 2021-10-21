@@ -5,6 +5,7 @@ import java.util.*;
 public class Escalonador {
 
     private static List<File> arquivos;
+    private static Map<BCP, String> nomesArquivos = new HashMap<>();
     private static int quantum;
     private static List<BCP> tabelaProcessos = new ArrayList<>();    //TABELA DE PROCESSOS
     private static Queue<BCP> processosProntos = new ArrayDeque<>();  //FILA DE PROCESSOS PRONTOS
@@ -13,7 +14,7 @@ public class Escalonador {
     private static List<BCP> listaProcessos;
     private static int qtdQuantum = 0;
 
-    
+
     /***********************************************************************************************
      *  Responsavel por pegar os arquivos da pasta "programas" e armazenar na variavel "arquivos". *
      *  Ele tb inicializa a variavel "quantum".                                                    *
@@ -70,7 +71,9 @@ public class Escalonador {
                 if (linha.equals("SAIDA")) {  //ultima linha do arquivo
                     comandos[i] = linha;
                     sc.close();
-                    return new BCP(nome, comandos);
+                    BCP bcp = new BCP(nome, comandos);
+                    nomesArquivos.put(bcp, file.getName());
+                    return bcp;
                 }
                 if (nome.equals("")) { //pega o nome do arquivo (primeira linha do arquivo)
                     nome = linha;
@@ -104,9 +107,9 @@ public class Escalonador {
     }
 
 
-    /************************************************************************************ 
-    *  Responsavel por fazer as devidas alteracoes quando houver uma instrucao "SAIDA"  *
-    * ***********************************************************************************/
+    /************************************************************************************
+     *  Responsavel por fazer as devidas alteracoes quando houver uma instrucao "SAIDA"  *
+     * ***********************************************************************************/
     public static void manipulaSAIDA(BCP bcp, int quantum) throws IOException {
 
         fileout.write(bcp.getNome() + " terminado. X=" + bcp.getRegistradorX() + ". " + "Y=" + bcp.getRegistradorY() + "\r\n");
@@ -210,11 +213,13 @@ public class Escalonador {
             }
         });
 
-        List<String> nomesProcessos = new ArrayList<>();
-        tabelaProcessos.forEach(bcp -> nomesProcessos.add(bcp.getNome()));
+        List<String> nomesArq = new ArrayList<>();
+        for (BCP bcp : nomesArquivos.keySet()) {
+            nomesArq.add(nomesArquivos.get(bcp));
+        }
 
         //ordena o nome dos processos em ordem alfabetica
-        Collections.sort(nomesProcessos, new Comparator<String>() {
+        Collections.sort(nomesArq, new Comparator<String>() {
             public int compare(String o1, String o2) {
                 return extractInt(o1) - extractInt(o2);
             }
@@ -227,17 +232,17 @@ public class Escalonador {
         });
 
         //add os processos na fila de Processos Prontos
-        for (String nome : nomesProcessos) {
-            for (BCP bcp : tabelaProcessos) {
+        for (String nome : nomesArq) {
+            for (BCP bcp : nomesArquivos.keySet()) {
                 boolean found = false;
-                if (bcp.getNome().equals(nome)) {
+                if (nomesArquivos.get(bcp).equals(nome)) {
                     processosProntos.add(bcp);
                     found = true;
                 }
                 if (found) break;
             }
         }
-
+        
         listaProcessos = new ArrayList<>(tabelaProcessos);
 
         for (BCP bcp : processosProntos) fileout.write("Carregando " + bcp.getNome() + "\r\n");
