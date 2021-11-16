@@ -10,7 +10,6 @@
 
 import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.concurrent.ThreadLocalRandom;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,12 +19,15 @@ import java.io.FileReader;
 
 public class Main {
 
+	private static final int numThreads = 100;
+	private static final int numAccess = 100;
 	private static ArrayList<String> words;
 	private static ArrayList<Integer> emptyPositions;
-	private static ObjectThread[] storage = new ObjectThread[100];
+	private static ObjectThread[] storage = new ObjectThread[numThreads];
+	private static RandomPosition random;
 
 	// Separa e guarda as palavras do texto
-	public static void separate() throws FileNotFoundException {
+	public static void separateWords() throws FileNotFoundException {
 		Scanner input = new Scanner(new FileReader("bd.txt"));
 		words = new ArrayList<String>();
 		while(input.hasNext()) {
@@ -33,52 +35,52 @@ public class Main {
 		}
 	}
 
-	// Proporção das threads, entre readers e writers
-	public static void PropThreads(int readers) {
-		int numReaders = readers;
-    	emptyPositions = new ArrayList<Integer>(); //Guarda as posics vazias
-     	for (int i = 0; i < 100; i++) emptyPositions.add(i);
+	// Cria e armazena os objetos das threads, de acordo com a proporção entre readers e writers
+	public static void createObjects(int numReaders) {
+    	emptyPositions = new ArrayList<Integer>(); //Guarda em cada indices, as posicoes que ainda estão vazias
+     	for (int i = 0; i < numThreads; i++) emptyPositions.add(i);
+     	random = new RandomPosition();
 
-      	ThreadLocalRandom random = ThreadLocalRandom.current();
+     	for(int i = 0; i < numThreads; i++) { //objetos
+    		// Pega-se uma posição vazia e ve qual indice esta nessa posicao
+    		int posic = random.getRandom(emptyPositions.size());
+    		int posicInserc = emptyPositions.get(posic); //pega qual posicao esta nesse indice
 
-      for(int i = 0; i < 100; i++) {
-      	ObjectThread obj;
+    		ObjectThread obj;
     		if(numReaders <= 0) obj = new Writer();  //De acordo com a proporcao
     		else obj = new Reader();
-
-    		int posic = random.nextInt(0,emptyPositions.size()); // gera uma posic aleatoria para inserir
-    		int posicInserc = emptyPositions.get(posic); //posicao vazia para inserir
-
-    		if(numReaders <= 0) storage[posicInserc] = obj; //Insere no objeto de threads
-    		else storage[posicInserc] = obj;
+    		storage[posicInserc] = obj;
 
     		emptyPositions.remove(posic); //Remove a posicao das posicoes vazias, dado que foi ocupado
     		numReaders--;
     	}
-
     }
 
+    //Método para o acesso para os que não são readers e writers
     public static void access() throws InterruptedException {
-
-    	ThreadLocalRandom random = ThreadLocalRandom.current();
+    	random = new RandomPosition();
     	int posicBase; //posicao das palavras
 
-    	for(int i = 0; i < 100; i++) { //todos os 100 objetos
+    	for(int i = 0; i < numThreads; i++) { //todos os objetos
     		ObjectThread obj = storage[i];
     		obj.start();
-    		for(int j = 0; j < 100; j++) { //fazer 100 acessos
-    			posicBase = random.nextInt(0,words.size());
+    		for(int j = 0; j < numAccess; j++) { //fazer os 100 acessos
+    			posicBase = random.getRandom(words.size());
     			obj.doAction(words,posicBase);
     		}
 			obj.sleep(1); //dormir por 1ms
+			obj.join();
 		}
-
 	}
+
+
 
 	public static void main(String[] args) {
 		try {
-			separate(); //separa as palavras do arquivo
-			for(int i = 0; i < 101;i++) PropThreads(i); // Proporção de readers and writers (como pode ser 100 e 0, vai ate 100)
+			separateWords(); //separa as palavras do arquivo
+			// for(int i = 0; i < 101;i++) createObjects(i); // teste (como pode ser 100 e 0, vai ate 100)
+			createObjects(0);
+			//accessRW();
 			access();
 		}
 		catch(IOException e) {}
