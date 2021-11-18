@@ -77,11 +77,11 @@ public class Main {
     			obj.unlock(threadsReads,readSemaphore,writeSemaphore);
     		}
 			obj.sleep(1);
-			obj.join();
+			if(obj.isAlive()) obj.join();
 		}
 
 		time = System.currentTimeMillis() - time;
-		System.out.println("TEMPO TOTAL READER E WRITER " + time); //pensar em algo melhor
+		//System.out.println("TEMPO TOTAL READER E WRITER " + time); //pensar em algo melhor
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class Main {
 		try {
 			FileText file = new FileText("bd.txt");
 			// for(int i = 0; i < 101;i++) createObjects(i); // teste (como pode ser 100 e 0, vai ate 100)
-			createObjects(0);
+			createObjects(100);
 			accessRW(file);
 			accessNonRW(file);
 		}
