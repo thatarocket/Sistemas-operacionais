@@ -28,13 +28,13 @@ public class Main {
 	protected static int threadsReads = 0;
 
 
-	/**
-	 * Cria e armazena os objetos das threads, de acordo com a proporção entre
-	 * readers e writers
-	 *
-	 * @param int numReaders
-	 * @return void
-	 */
+   /**
+	* Cria e armazena os objetos das threads, de acordo com a proporção entre
+	* readers e writers
+	*
+	* @param int numReaders
+	* @return void
+	*/
 	public static void createObjects(int numReaders) {
     	emptyPositions = new ArrayList<Integer>();
      	for (int i = 0; i < numThreads; i++) emptyPositions.add(i);
@@ -72,10 +72,11 @@ public class Main {
     		obj.start();
     		for(int j = 0; j < numAccess;j++) {
     			posicBase = random.getRandom(file.getSize());
-    			obj.acessFiles(file.words,posicBase);
+    			obj.lock(threadsReads,file.words,posicBase,readSemaphore,writeSemaphore);
+    			obj.unlock(threadsReads,readSemaphore,writeSemaphore);
     		}
     		obj.sleep(1);
-    		if(obj.isAlive()) obj.join();
+    		//obj.join(); 
     	}
 
 		timeRw = System.currentTimeMillis() - timeRw;
