@@ -24,8 +24,8 @@ public class Main {
 	protected static long timeRw;
 
 	protected static Semaphore readSemaphore = new Semaphore(1);
-    protected static Semaphore writeSemaphore = new Semaphore(1);
-    protected static int threadsReads = 0;
+	protected static Semaphore writeSemaphore = new Semaphore(1);
+	protected static int threadsReads = 0;
 
 
 	/**
