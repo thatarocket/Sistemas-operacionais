@@ -56,12 +56,12 @@ public class Main {
     }
 
     /**
-		 * Método para o acesso para os que são readers e writers
-		 *
-		 * @param FileText file
-		 * @throws InterruptedException
-		 * @return void
-		 */
+	* Método para o acesso para os que são readers e writers
+	*
+	* @param FileText file
+	* @throws InterruptedException
+	* @return void
+	*/
     public static void accessRW(FileText file) throws InterruptedException {
 
     	random = new RandomPosition();
