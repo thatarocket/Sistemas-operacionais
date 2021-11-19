@@ -21,11 +21,11 @@ public class Main {
 	protected static ArrayList<Integer> emptyPositions;
 	protected static ObjectThread[] storage = new ObjectThread[numThreads];
 	protected static RandomPosition random;
-	protected static long time;
+	protected static long timeRw;
 
 	protected static Semaphore readSemaphore = new Semaphore(1);
-        protected static Semaphore writeSemaphore = new Semaphore(1);
-        protected static int threadsReads = 0;
+    protected static Semaphore writeSemaphore = new Semaphore(1);
+    protected static int threadsReads = 0;
 
 
 	/**
@@ -52,7 +52,7 @@ public class Main {
     		emptyPositions.remove(posic);
     		numReaders--;
     	}
-			time = System.currentTimeMillis();
+			timeRw = System.currentTimeMillis();
     }
 
     /**
@@ -70,18 +70,16 @@ public class Main {
     	for(int i = 0; i < numThreads; i++) {
     		ObjectThread obj = storage[i];
     		obj.start();
-    		for(int j = 0; j < numAccess; j++) {
-    			posicBase = random.getRandom(file.getSize());    			
-    			obj.lock(threadsReads,readSemaphore,writeSemaphore);
+    		for(int j = 0; j < numAccess;j++) {
+    			posicBase = random.getRandom(file.getSize());
     			obj.acessFiles(file.words,posicBase);
-    			obj.unlock(threadsReads,readSemaphore,writeSemaphore);
     		}
-			obj.sleep(1);
-			if(obj.isAlive()) obj.join();
-		}
+    		obj.sleep(1);
+    		if(obj.isAlive()) obj.join();
+    	}
 
-		time = System.currentTimeMillis() - time;
-		//System.out.println("TEMPO TOTAL READER E WRITER " + time); //pensar em algo melhor
+		timeRw = System.currentTimeMillis() - timeRw;
+		System.out.println("TEMPO TOTAL READER E WRITER " + timeRw); //pensar em algo melhor
 	}
 
 	/**
@@ -92,14 +90,14 @@ public class Main {
 	 * @return void
 	 */
 	public static void accessNonRW(FileText file) throws InterruptedException {
-
-	}
+	
+	} 
 
 	public static void main(String[] args) {
 		try {
 			FileText file = new FileText("bd.txt");
 			// for(int i = 0; i < 101;i++) createObjects(i); // teste (como pode ser 100 e 0, vai ate 100)
-			createObjects(100);
+			createObjects(50);
 			accessRW(file);
 			accessNonRW(file);
 		}
