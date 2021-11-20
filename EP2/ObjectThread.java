@@ -12,7 +12,6 @@ import java.util.concurrent.Semaphore;
 
 public class ObjectThread extends Thread {
 
-    public ObjectThread(ArrayList<String> words,int numAcess,Semaphore readSemaphore,Semaphore writeSemaphore){}
 	public void acessFiles(int posicBase){}
 	public void lock(int posicBase) throws InterruptedException {}
 	public void unlock(int threadsReads) throws InterruptedException {}
