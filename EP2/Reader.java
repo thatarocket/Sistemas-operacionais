@@ -52,9 +52,9 @@ public class Reader extends ObjectThread {
     readSemaphore.acquire();
     if(threadsReads == 0){
       writeSemaphore.acquire();
+      acessFiles(posicBase);
     }
     threadsReads++;
-    acessFiles(posicBase);
     readSemaphore.release();
   }
 
@@ -75,13 +75,16 @@ public class Reader extends ObjectThread {
 
 	@Override
 	public void run() {
-    random = new RandomPosition();
-    for(int k=0; k<numAcess;k++) {
-      posicBase = random.getRandom(words.getSize());
-      this.lock(posicBase);
-      this.unlock(threadsReads);
-      this.sleep(1);
+    try {
+      random = new RandomPosition();
+      for(int k=0; k<numAcess;k++) {
+        posicBase = random.getRandom(words.size());
+        this.lock(posicBase);
+        this.unlock(threadsReads);
+        this.sleep(1);
+      }
     }
+    catch(InterruptedException e) {}
 
 	}
 
