@@ -12,9 +12,10 @@ import java.util.concurrent.Semaphore;
 
 public class ObjectThread extends Thread {
 
-	public void acessFiles(ArrayList<String> words,int posicBase){}
-	public synchronized void lock(int threadsReads,ArrayList<String> words,int posicBase,Semaphore readSemaphore,Semaphore writeSemaphore) throws InterruptedException {}
-	public synchronized void unlock(int threadsReads,Semaphore readSemaphore,Semaphore writeSemaphore) throws InterruptedException {}
+    public ObjectThread(ArrayList<String> words,int numAcess,Semaphore readSemaphore,Semaphore writeSemaphore){}
+	public void acessFiles(int posicBase){}
+	public void lock(int posicBase) throws InterruptedException {}
+	public void unlock(int threadsReads) throws InterruptedException {}
 
 	@Override
 	public void run(){}
