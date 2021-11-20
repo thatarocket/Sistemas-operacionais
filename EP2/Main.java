@@ -32,7 +32,7 @@ public class Main {
 	* @param int numReaders
 	* @return void
 	*/
-	public static void createObjects(int numReaders) {
+	public static void createObjects(int numReaders,FileText file) {
     	emptyPositions = new ArrayList<Integer>();
      	for (int i = 0; i < numThreads; i++) emptyPositions.add(i);
      	random = new RandomPosition();
@@ -42,8 +42,8 @@ public class Main {
     		int posicInserc = emptyPositions.get(posic); //pega qual posicao esta nesse indice
 
     		ObjectThread obj;
-    		if(numReaders <= 0) obj = new Writer(words,numAccess,readSemaphore,writeSemaphore);
-    		else obj = new Reader(words,numAccess,readSemaphore,writeSemaphore);
+    		if(numReaders <= 0) obj = new Writer(file.words,numAccess,readSemaphore,writeSemaphore);
+    		else obj = new Reader(file.words,numAccess,readSemaphore,writeSemaphore);
     		storage[posicInserc] = obj;
 
     		emptyPositions.remove(posic);
@@ -83,7 +83,7 @@ public class Main {
 		try {
 			FileText file = new FileText("bd.txt");
 			// for(int i = 0; i < 101;i++) createObjects(i); // teste (como pode ser 100 e 0, vai ate 100)
-			createObjects(50);
+			createObjects(50,file);
 			accessRW(file);
 			accessNonRW(file);
 		}
