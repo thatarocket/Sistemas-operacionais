@@ -31,7 +31,6 @@ public class Main {
    /**
 	* Cria e armazena os objetos das threads, de acordo com a proporção entre
 	* readers e writers
-	*
 	* @param int numReaders
 	* @return void
 	*/
@@ -67,7 +66,7 @@ public class Main {
     	random = new RandomPosition();
     	int posicBase;
 
-    	for(int i = 0; i < numThreads; i++) {
+     	for(int i = 0; i < numThreads; i++) {
     		ObjectThread obj = storage[i];
     		obj.start();
     		for(int j = 0; j < numAccess;j++) {
@@ -76,6 +75,7 @@ public class Main {
     			obj.unlock(threadsReads,readSemaphore,writeSemaphore);
     		}
     		obj.sleep(1);
+    		obj.notify();
     		//obj.join(); 
     	}
 
