@@ -25,8 +25,6 @@ public class Main {
 
 	protected static Semaphore readSemaphore = new Semaphore(1);
 	protected static Semaphore writeSemaphore = new Semaphore(1);
-	protected static int threadsReads = 0;
-
 
    /**
 	* Cria e armazena os objetos das threads, de acordo com a proporção entre
@@ -44,8 +42,8 @@ public class Main {
     		int posicInserc = emptyPositions.get(posic); //pega qual posicao esta nesse indice
 
     		ObjectThread obj;
-    		if(numReaders <= 0) obj = new Writer();
-    		else obj = new Reader();
+    		if(numReaders <= 0) obj = new Writer(words,numAccess,readSemaphore,writeSemaphore);
+    		else obj = new Reader(words,numAccess,readSemaphore,writeSemaphore);
     		storage[posicInserc] = obj;
 
     		emptyPositions.remove(posic);
@@ -56,27 +54,14 @@ public class Main {
 
     /**
 	* Método para o acesso para os que são readers e writers
-	*
 	* @param FileText file
 	* @throws InterruptedException
 	* @return void
 	*/
     public static void accessRW(FileText file) throws InterruptedException {
-
-    	random = new RandomPosition();
-    	int posicBase;
-
      	for(int i = 0; i < numThreads; i++) {
     		ObjectThread obj = storage[i];
     		obj.start();
-    		for(int j = 0; j < numAccess;j++) {
-    			posicBase = random.getRandom(file.getSize());
-    			obj.lock(threadsReads,file.words,posicBase,readSemaphore,writeSemaphore);
-    			obj.unlock(threadsReads,readSemaphore,writeSemaphore);
-    		}
-    		obj.sleep(1);
-    		obj.notify();
-    		//obj.join(); 
     	}
 
 		timeRw = System.currentTimeMillis() - timeRw;
