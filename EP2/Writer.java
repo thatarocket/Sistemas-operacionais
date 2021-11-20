@@ -63,13 +63,16 @@ public class Writer extends ObjectThread {
 
 	@Override
 	public void run() {
-      random = new RandomPosition();
-      for(int k=0; k<numAcess;k++) {
-         posicBase = random.getRandom(words.getSize());
-         this.lock(posicBase);
-         this.unlock(threadsReads);
-         this.sleep(1);
+      try {
+         random = new RandomPosition();
+         for(int k=0; k<numAcess;k++) {
+           posicBase = random.getRandom(words.size());
+           this.lock(posicBase);
+           this.unlock(threadsReads);
+           this.sleep(1);
+         }
       }
+      catch(InterruptedException e) {}
 	}
 
 }
