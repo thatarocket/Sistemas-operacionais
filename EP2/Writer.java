@@ -10,48 +10,66 @@
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
+/**
+ * Acessa a base para a escrita
+ */
 public class Writer extends ObjectThread {
-//Escrevem na base
+
+   protected static String currentWord; 
+   protected static RandomPosition random;
+   protected int posicBase;
+   protected static ArrayList<String> words; 
+   protected static int numAcess;   
+   protected static Semaphore readSemaphore;
+   protected static Semaphore writeSemaphore; 
+   protected static int threadsReads = 0; 
+
+   public Writer(ArrayList<String> words,int numAcess,Semaphore readSemaphore,Semaphore writeSemaphore) {
+      this.words = words;
+      this.numAcess = numAcess;
+      this.readSemaphore = readSemaphore;
+      this.writeSemaphore = writeSemaphore;
+   }
 
    /**
     * Acessa os arquivos, modifica determina posicao da base
-    * @param ArrayList<String> words
     * @param int posicBase
     * @return void
     */
-	public void acessFiles(ArrayList<String> words,int posicBase) {
+	public void acessFiles(int posicBase) {
 		words.set(posicBase,"MODIFICADO");
 	}
 
    /**
    	* Trava o acesso a base para todos os acessos
-   	* @param int threadsReads
-   	* @param ArrayList<String> words
    	* @param int posicBase
-   	* @param Semaphore readSemaphore
-   	* @param Semaphore writeSemaphore
    	* @throws InterruptedException
    	* @return void
    	*/
-	public synchronized void lock(int threadsReads,ArrayList<String> words,int posicBase,Semaphore readSemaphore,Semaphore writeSemaphore) throws InterruptedException {
+	public void lock(int posicBase) throws InterruptedException {
 		writeSemaphore.acquire();
+      acessFiles(posicBase);
 	}
 
    /**
     * Desbloqueia o acesso a base
     * @param int threadsReads
-    * @param Semaphore readSemaphore
-    * @param Semaphore writeSemaphore
     * @throws InterruptedException
     * @return void
     */
-	public synchronized void unlock(int threadsReads,Semaphore readSemaphore,Semaphore writeSemaphore) throws InterruptedException {
+	public void unlock(int threadsReads) throws InterruptedException {
 		writeSemaphore.release();
 	}
 
 	@Override
 	public void run() {
-
+      random = new RandomPosition();
+      for(int k=0; k<numAcess;k++) {
+         posicBase = random.getRandom(words.getSize());
+         this.lock(posicBase);
+         this.unlock(threadsReads);
+         this.sleep(1);
+      }
 	}
 
 }
