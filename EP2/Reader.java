@@ -15,7 +15,21 @@ import java.util.concurrent.Semaphore;
  */
 public class Reader extends ObjectThread {
 
-  protected static String currentWord;
+  protected static String currentWord; 
+  protected static RandomPosition random;
+  protected int posicBase;
+  protected static ArrayList<String> words; 
+  protected static int numAcess;   
+  protected static Semaphore readSemaphore;
+  protected static Semaphore writeSemaphore; 
+  protected static int threadsReads = 0; 
+
+  public Reader(ArrayList<String> words,int numAcess,Semaphore readSemaphore,Semaphore writeSemaphore) {
+    this.words = words;
+    this.numAcess = numAcess;
+    this.readSemaphore = readSemaphore;
+    this.writeSemaphore = writeSemaphore;
+  }
 
   /**
    * Acessa os arquivos, lê a posicao da base e a armazena
@@ -23,39 +37,34 @@ public class Reader extends ObjectThread {
    * @param int posicBase
    * @return void
    */
-	public void acessFiles(ArrayList<String> words,int posicBase) {
+	public void acessFiles(int posicBase) {
 		this.currentWord = words.get(posicBase);
 	}
 
   /**
    * Trava o acesso a base do escritor, para o leitor acessar
    * @param int threadsReads
-   * @param ArrayList<String> words
    * @param int posicBase
-   * @param Semaphore readSemaphore
-   * @param Semaphore writeSemaphore
    * @throws InterruptedException
    * @return void
    */
-  public synchronized void lock(int threadsReads,ArrayList<String> words,int posicBase,Semaphore readSemaphore,Semaphore writeSemaphore) throws InterruptedException {
+  public void lock(int posicBase) throws InterruptedException {
     readSemaphore.acquire();
     if(threadsReads == 0){
       writeSemaphore.acquire();
     }
     threadsReads++;
-    acessFiles(words,posicBase);
+    acessFiles(posicBase);
     readSemaphore.release();
   }
 
   /**
    * Desbloqueia o acesso a base
    * @param int threadsReads
-   * @param Semaphore readSemaphore
-   * @param Semaphore writeSemaphore
    * @throws InterruptedException
    * @return void
    */
-  public synchronized void unlock(int threadsReads,Semaphore readSemaphore,Semaphore writeSemaphore) throws InterruptedException {
+  public void unlock(int threadsReads) throws InterruptedException {
     readSemaphore.acquire();
     threadsReads--;
     if(threadsReads == 0){
@@ -66,7 +75,13 @@ public class Reader extends ObjectThread {
 
 	@Override
 	public void run() {
-	
+    random = new RandomPosition();
+    for(int k=0; k<numAcess;k++) {
+      posicBase = random.getRandom(words.getSize());
+      this.lock(posicBase);
+      this.unlock(threadsReads);
+      this.sleep(1);
+    }
 
 	}
 
