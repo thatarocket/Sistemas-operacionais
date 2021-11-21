@@ -18,32 +18,47 @@ import java.io.FileReader;
 
 public class FileText {
 
-	protected Scanner input;
-	protected static ArrayList<String> words;
+    protected Scanner input;
+    protected static ArrayList<String> words;
+    protected static ArrayList<String> wordsN;
 
    /**
     * Le o nome do arquivo, separa e armazena as palavras do arquivo 
-    *
     * @param String fileName
     * @throws FileNotFoundException
     */
-	public FileText(String fileName) throws FileNotFoundException {
-		input = new Scanner(new File(fileName));
-		words = new ArrayList<String>();
-		while(input.hasNext()) {
-			words.add(input.next());
-		}
-	}
+    public FileText(String fileName) throws FileNotFoundException {
+        input = new Scanner(new File(fileName));
+        words = new ArrayList<String>();
+        wordsN = new ArrayList<String>();
+        while(input.hasNext()) {
+            String received = input.next();
+            words.add(received);
+            wordsN.add(received);
+        }
+    }
 
-    public String getWord(int index) {
-        return words.get(index);
+    public ArrayList<String> getWords(int index) {
+        return words;
+    }
+
+    public ArrayList<String> getWordsN(int index) {
+        return wordsN;
     }
 
     public int getSize() {
-    	return words.size();
+        return words.size();
+    }
+
+    public int getSizeN() {
+        return wordsN.size();
     }
     
     public void getPrint() {
         for(String palavras : words) System.out.println(palavras);
+    }
+
+    public void getPrintN() {
+        for(String palavras : wordsN) System.out.println(palavras);
     }
 }
