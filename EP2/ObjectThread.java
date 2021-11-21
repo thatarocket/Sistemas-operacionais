@@ -12,10 +12,10 @@ import java.util.concurrent.Semaphore;
 
 public class ObjectThread extends Thread {
 
-	public void acessFiles(int posicBase){}
-	public void lock(int posicBase) throws InterruptedException {}
-	public void unlock() throws InterruptedException {}
+    public void acessFiles(int posicBase){}
+    public void lock(int posicBase) throws InterruptedException {}
+    public void unlock() throws InterruptedException {}
 
-	@Override
-	public void run(){}
+    @Override
+    public void run(){}
 }
