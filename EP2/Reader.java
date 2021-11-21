@@ -48,13 +48,14 @@ public class Reader extends ObjectThread {
    * @throws InterruptedException
    * @return void
    */
-  public void lock(int posicBase) throws InterruptedException {
+  public synchronized void lock(int posicBase) throws InterruptedException {
     readSemaphore.acquire();
     if(threadsReads == 0){
       writeSemaphore.acquire();
-      acessFiles(posicBase);
     }
+    acessFiles(posicBase);
     threadsReads++;
+    //System.out.println("Adicionei " + threadsReads);
     readSemaphore.release();
   }
 
@@ -64,9 +65,10 @@ public class Reader extends ObjectThread {
    * @throws InterruptedException
    * @return void
    */
-  public void unlock(int threadsReads) throws InterruptedException {
+  public synchronized void unlock() throws InterruptedException {
     readSemaphore.acquire();
     threadsReads--;
+    //System.out.println("Removi " + threadsReads);
     if(threadsReads == 0){
       writeSemaphore.release();
     }
@@ -80,9 +82,11 @@ public class Reader extends ObjectThread {
       for(int k=0; k<numAcess;k++) {
         posicBase = random.getRandom(words.size());
         this.lock(posicBase);
-        this.unlock(threadsReads);
-        this.sleep(1);
+        //System.out.println("~~ LOCK READ: " + readSemaphore.availablePermits() + " WRITE " + writeSemaphore.availablePermits());
+        this.unlock();
+        //System.out.println("~~ UNLOCK READ: " +readSemaphore.availablePermits() + " WRITE " + writeSemaphore.availablePermits());
       }
+      this.sleep(1);
     }
     catch(InterruptedException e) {}
 
