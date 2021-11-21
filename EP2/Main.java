@@ -25,6 +25,8 @@ public class Main {
 	protected static RandomPosition random;
 	protected static long time;
 	protected static long timeRw;
+	protected static long mediaRW;
+	protected static long mediaNRW;
 
 	protected static Semaphore readSemaphore = new Semaphore(1);
 	protected static Semaphore writeSemaphore = new Semaphore(1);
@@ -74,8 +76,7 @@ public class Main {
     		}
     	}
 		timeRw = System.currentTimeMillis() - timeRw;
-		
-		System.out.println(timeRw); //pensar em algo melhor
+		mediaRW += timeRw;
 	}
 
 	/**
@@ -124,31 +125,36 @@ public class Main {
     		}
     	}
 		time = System.currentTimeMillis() - time;
-		
-		System.out.println(time); //pensar em algo melhor
-	
+		mediaNRW += time;
+			
 	} 
 
 	public static void main(String[] args) {
 		try {
 			FileText file = new FileText("bd.txt");
 			System.out.println("Readers e writers: ");
-			for(int i = 0; i < numThreads+1;i++) {//como pode ser 100 e 0, vai ate 100
-				System.out.println("Proporcao readers: " + i + " writers " + (numThreads-i));					
+			for(int i = 0; i < numThreads+1;i++) {//como pode ser 100 e 0, vai ate 100				
 				for(int k = 0; k < numRepeat; k++) { 				
 					createObjects(0,file);
 					accessRW(file);
 				}
+				mediaRW /= numRepeat;
+				System.out.println(mediaRW);
+				mediaRW = 0; 
 			}
 
-			System.out.println("Sem readers e writers: ");
-			for(int i = 0; i < numThreads+1;i++) {//como pode ser 100 e 0, vai ate 100	
-				System.out.println("Proporcao readers: " + i + " writers " + (numThreads-i));				
+			System.out.println("Sem Readers e writers: ");
+			for(int i = 0; i < numThreads+1;i++) {//como pode ser 100 e 0, vai ate 100				
 				for(int k = 0; k < numRepeat; k++) {
 					createObjectsNonRW(0,file);
 					accessNonRW(file);
 				}
+				mediaNRW /= numRepeat;
+				System.out.println(mediaNRW);
+				mediaNRW = 0; 
 			}
+
+
 		}
 		catch(FileNotFoundException e) {
 			System.out.println("ERRO - Nome do arquivo digitado não encontrado!");
