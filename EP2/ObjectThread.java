@@ -14,7 +14,7 @@ public class ObjectThread extends Thread {
 
 	public void acessFiles(int posicBase){}
 	public void lock(int posicBase) throws InterruptedException {}
-	public void unlock(int threadsReads) throws InterruptedException {}
+	public void unlock() throws InterruptedException {}
 
 	@Override
 	public void run(){}
