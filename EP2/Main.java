@@ -49,7 +49,7 @@ public class Main {
     		emptyPositions.remove(posic);
     		numReaders--;
     	}
-			timeRw = System.currentTimeMillis();
+		timeRw = System.currentTimeMillis();
     }
 
     /**
@@ -64,7 +64,13 @@ public class Main {
     		obj.start();
     	}
 
+    	for(ObjectThread objects : storage) {
+    		if(objects.isAlive()) {
+    			objects.join();
+    		}
+    	}
 		timeRw = System.currentTimeMillis() - timeRw;
+		
 		System.out.println("TEMPO TOTAL READER E WRITER " + timeRw); //pensar em algo melhor
 	}
 
@@ -83,7 +89,7 @@ public class Main {
 		try {
 			FileText file = new FileText("bd.txt");
 			// for(int i = 0; i < 101;i++) createObjects(i); // teste (como pode ser 100 e 0, vai ate 100)
-			createObjects(50,file);
+			createObjects(100,file);
 			accessRW(file);
 			accessNonRW(file);
 		}
