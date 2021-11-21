@@ -75,7 +75,7 @@ public class Main {
     	}
 		timeRw = System.currentTimeMillis() - timeRw;
 		
-		System.out.println("TEMPO TOTAL READER E WRITER " + timeRw); //pensar em algo melhor
+		System.out.println(timeRw); //pensar em algo melhor
 	}
 
 	/**
@@ -125,18 +125,26 @@ public class Main {
     	}
 		time = System.currentTimeMillis() - time;
 		
-		System.out.println("TEMPO TOTAL SEM READER E WRITER " + time); //pensar em algo melhor
+		System.out.println(time); //pensar em algo melhor
 	
 	} 
 
 	public static void main(String[] args) {
 		try {
 			FileText file = new FileText("bd.txt");
-			for(int i = 0; i < numThreads+1;i++) {//como pode ser 100 e 0, vai ate 100	
-				System.out.println("Proporcao readers: " + i + " writers " + (numThreads-i));
+			System.out.println("Readers e writers: ");
+			for(int i = 0; i < numThreads+1;i++) {//como pode ser 100 e 0, vai ate 100
+				System.out.println("Proporcao readers: " + i + " writers " + (numThreads-i));					
 				for(int k = 0; k < numRepeat; k++) { 				
 					createObjects(0,file);
 					accessRW(file);
+				}
+			}
+
+			System.out.println("Sem readers e writers: ");
+			for(int i = 0; i < numThreads+1;i++) {//como pode ser 100 e 0, vai ate 100	
+				System.out.println("Proporcao readers: " + i + " writers " + (numThreads-i));				
+				for(int k = 0; k < numRepeat; k++) {
 					createObjectsNonRW(0,file);
 					accessNonRW(file);
 				}
