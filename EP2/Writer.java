@@ -47,6 +47,7 @@ public class Writer extends ObjectThread {
       * @return void
       */
    public void lock(int posicBase) throws InterruptedException {
+      readSemaphore.acquire();
       writeSemaphore.acquire();
       acessFiles(posicBase);
    }
@@ -57,6 +58,7 @@ public class Writer extends ObjectThread {
     * @return void
     */
    public void unlock() throws InterruptedException {
+      readSemaphore.release();
       writeSemaphore.release();
    }
 
