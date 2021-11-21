@@ -37,7 +37,9 @@ public class Writer extends ObjectThread {
     * @return void
     */
 	public void acessFiles(int posicBase) {
+      //System.out.println("MODIFICANDO NA POSIC " + posicBase);
 		words.set(posicBase,"MODIFICADO");
+      //System.out.println("ATUALIZANDO " + words.get(posicBase));
 	}
 
    /**
@@ -57,7 +59,7 @@ public class Writer extends ObjectThread {
     * @throws InterruptedException
     * @return void
     */
-	public void unlock(int threadsReads) throws InterruptedException {
+	public void unlock() throws InterruptedException {
 		writeSemaphore.release();
 	}
 
@@ -68,7 +70,9 @@ public class Writer extends ObjectThread {
          for(int k=0; k<numAcess;k++) {
            posicBase = random.getRandom(words.size());
            this.lock(posicBase);
-           this.unlock(threadsReads);
+           //System.out.println("~~ LOCK WRITER: " + readSemaphore.availablePermits() + " WRITE " + writeSemaphore.availablePermits());
+           this.unlock();
+           //System.out.println("~~ UNLOCK WRITER: " + readSemaphore.availablePermits() + " WRITE " + writeSemaphore.availablePermits());
            this.sleep(1);
          }
       }
