@@ -132,9 +132,9 @@ public class Main {
 	public static void main(String[] args) {
 		try {
 			FileText file = new FileText("bd.txt");
-			for(int i = 0; i < numThreads+1;i++) {
-				for(int k = 0; k < numRepeat; k++) { //como pode ser 100 e 0, vai ate 100
-					System.out.println("Proporcao readers: " + i + " writers " + (numThreads-i));
+			for(int i = 0; i < numThreads+1;i++) {//como pode ser 100 e 0, vai ate 100	
+				System.out.println("Proporcao readers: " + i + " writers " + (numThreads-i));
+				for(int k = 0; k < numRepeat; k++) { 				
 					createObjects(0,file);
 					accessRW(file);
 					createObjectsNonRW(0,file);
@@ -142,7 +142,11 @@ public class Main {
 				}
 			}
 		}
-		catch(FileNotFoundException e) {}
-		catch(InterruptedException e2) {}
+		catch(FileNotFoundException e) {
+			System.out.println("ERRO - Nome do arquivo digitado não encontrado!");
+		}
+		catch(InterruptedException e2) {
+			System.out.println("ERRO - Alguma thread interrompeu a thread atual!");
+		}
 	}
 }
