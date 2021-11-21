@@ -33,17 +33,15 @@ public class Reader extends ObjectThread {
 
   /**
    * Acessa os arquivos, lê a posicao da base e a armazena
-   * @param ArrayList<String> words
    * @param int posicBase
    * @return void
    */
-	public void acessFiles(int posicBase) {
-		this.currentWord = words.get(posicBase);
-	}
+  public void acessFiles(int posicBase) {
+    this.currentWord = words.get(posicBase);
+  }
 
   /**
    * Trava o acesso a base do escritor, para o leitor acessar
-   * @param int threadsReads
    * @param int posicBase
    * @throws InterruptedException
    * @return void
@@ -55,41 +53,36 @@ public class Reader extends ObjectThread {
     }
     acessFiles(posicBase);
     threadsReads++;
-    //System.out.println("Adicionei " + threadsReads);
     readSemaphore.release();
   }
 
   /**
    * Desbloqueia o acesso a base
-   * @param int threadsReads
    * @throws InterruptedException
    * @return void
    */
   public synchronized void unlock() throws InterruptedException {
     readSemaphore.acquire();
     threadsReads--;
-    //System.out.println("Removi " + threadsReads);
     if(threadsReads == 0){
       writeSemaphore.release();
     }
     readSemaphore.release();
   }
 
-	@Override
-	public void run() {
+  @Override
+  public void run() {
     try {
       random = new RandomPosition();
       for(int k=0; k<numAcess;k++) {
         posicBase = random.getRandom(words.size());
         this.lock(posicBase);
-        //System.out.println("~~ LOCK READ: " + readSemaphore.availablePermits() + " WRITE " + writeSemaphore.availablePermits());
         this.unlock();
-        //System.out.println("~~ UNLOCK READ: " +readSemaphore.availablePermits() + " WRITE " + writeSemaphore.availablePermits());
       }
       this.sleep(1);
     }
     catch(InterruptedException e) {}
 
-	}
+  }
 
 }
