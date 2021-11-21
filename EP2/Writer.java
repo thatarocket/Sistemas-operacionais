@@ -32,51 +32,46 @@ public class Writer extends ObjectThread {
    }
 
    /**
-    * Acessa os arquivos, modifica determina posicao da base
+    * Acessa os arquivos, modifica determinada posicao da base
     * @param int posicBase
     * @return void
     */
-	public void acessFiles(int posicBase) {
-      //System.out.println("MODIFICANDO NA POSIC " + posicBase);
-		words.set(posicBase,"MODIFICADO");
-      //System.out.println("ATUALIZANDO " + words.get(posicBase));
-	}
+   public void acessFiles(int posicBase) {
+      words.set(posicBase,"MODIFICADO");
+   }
 
    /**
-   	* Trava o acesso a base para todos os acessos
-   	* @param int posicBase
-   	* @throws InterruptedException
-   	* @return void
-   	*/
-	public void lock(int posicBase) throws InterruptedException {
-		writeSemaphore.acquire();
+      * Trava o acesso a base
+      * @param int posicBase
+      * @throws InterruptedException
+      * @return void
+      */
+   public void lock(int posicBase) throws InterruptedException {
+      writeSemaphore.acquire();
       acessFiles(posicBase);
-	}
+   }
 
    /**
     * Desbloqueia o acesso a base
-    * @param int threadsReads
     * @throws InterruptedException
     * @return void
     */
-	public void unlock() throws InterruptedException {
-		writeSemaphore.release();
-	}
+   public void unlock() throws InterruptedException {
+      writeSemaphore.release();
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
       try {
          random = new RandomPosition();
          for(int k=0; k<numAcess;k++) {
            posicBase = random.getRandom(words.size());
            this.lock(posicBase);
-           //System.out.println("~~ LOCK WRITER: " + readSemaphore.availablePermits() + " WRITE " + writeSemaphore.availablePermits());
            this.unlock();
-           //System.out.println("~~ UNLOCK WRITER: " + readSemaphore.availablePermits() + " WRITE " + writeSemaphore.availablePermits());
            this.sleep(1);
          }
       }
       catch(InterruptedException e) {}
-	}
+   }
 
 }
