@@ -1,5 +1,5 @@
 # Sistemas-operacionais
-EPS entregues na matéria de sistemas operacionais no ano de 2021, 4ºsemestre do curso de sistemas de informação. </p> 
+EPS entregues na matéria de sistemas operacionais no ano de 2021, 4º semestre do curso de sistemas de informação. </p> 
 
 **Exercício Programa 1 (EP1):**</p>
 
