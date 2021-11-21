@@ -43,4 +43,7 @@ public class FileText {
     	return words.size();
     }
     
+    public void getPrint() {
+        for(String palavras : words) System.out.println(palavras);
+    }
 }
